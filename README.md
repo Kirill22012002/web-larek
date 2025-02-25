@@ -54,6 +54,56 @@ yarn build
 
 # Отображения
 
+```ts
+interface IView {
+	render(data?: object): HTMLElement;
+}
+
+class BasketView implements IView {
+    constructor(protected container: HTMLElement) {}
+    render(data: { items: HTMLElement[] }) {
+        if (data) {
+			this.container.replaceChildren(...data.items);
+		}
+		return this.container;
+    }
+}
+```
+
 # Модели
+Есть IBasketModel который умеет добавлять и удалять определённые элементы из списка
+
+```ts
+interface IBasketModel {
+	items: Map<string, number>;
+	add(id: string): void;
+	remove(id: string): void;
+}
+```
 
 # Контроллеры
+
+Брокер событий
+```ts
+interface IEventEmitter {
+	emit: (event: string, data: unknown) => void;
+}
+```
+
+Например в данном случае мы слушаем события 'basket:change', 'ui:basket-add',
+'ui:basket-remove' и в зависимости от события делаем разные действия, рендерим корзину,
+добавляем новый элемент в корзину, удаляем элемент из корзины
+```ts
+events.on('basket:change', (event: { items: string[] }) => {
+	renderBasket(event.items);
+});
+
+events.on('ui:basket-add', (event: { id: string }) => {
+	basketModel.add(event.id);
+});
+
+events.on('ui:basket-remove', (event: { id: string }) => {
+	basketModel.remove(event.id);
+});
+
+```

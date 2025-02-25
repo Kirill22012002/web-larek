@@ -71,13 +71,22 @@ class BasketView implements IView {
 ```
 
 # Модели
-Есть IBasketModel который умеет добавлять и удалять определённые элементы из списка
-
+IBasketModel умеет добавлять и удалять определённые элементы из списка
 ```ts
 interface IBasketModel {
 	items: Map<string, number>;
 	add(id: string): void;
 	remove(id: string): void;
+}
+```
+
+ICatalogModel умеет добавлять объекты типа IProduct в список, и получать объект
+по id.
+```ts
+interface ICatalogModel {
+	items: IProduct[];
+	setItems(items: IProduct[]): void;
+	getProduct(id: string): IProduct;
 }
 ```
 

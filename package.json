@@ -1,5 +1,5 @@
 {
-  "name": "my-webpack-project",
+  "name": "web-larek",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -43,5 +43,14 @@
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier ./src --write",
     "deploy": "gh-pages -d dist"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kirill22012002/web-larek.git"
+  },
+  "author": "Kirill Perepechkin",
+  "bugs": {
+    "url": "https://github.com/Kirill22012002/web-larek/issues"
+  },
+  "homepage": "https://github.com/Kirill22012002/web-larek#readme"
 }

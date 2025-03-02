@@ -8,6 +8,10 @@
 Проект реализован на TypeScript и представляет собой SPA (Single Page Application) с использованием API для получения данных о товарах и создание заказа. Также на странице
 есть модальные окна карточки товара, корзины и оформления заказа.
 
+## Выбранная архитектура - Событийно-ориентированная
+У нас есть модели, вьюшки и брокер событий и весь код будет 
+собираться вместе в index.ts
+
 ## Установка и запуск
 Для установки и запуска проекта необходимо выполнить команды
 
@@ -50,47 +54,77 @@ yarn build
 - src/utils/utils.ts — файл с утилитами
 
 ## Архитектура проекта (MVC)
-![Архитектура](image-2.png)
+На данной архитектуре есть интерфейсы моделей данных и моделей отображения. Реализаций здесь нет,
+это сделано, чтобы не усложнять данный рисунок.
+![Architecture](Architecture.drawio.png)
 
-# Отображения
+# Модели (Model) 
+
+Здесь у нас интерфейсы с которыми мы будем работать, 
+реализация интерфейса ICatalog - будет хранить api, items, и имеет метод load.
+реализация интерфейса ICatalogAPI - будет делать запросы к серверу.
+реализации интерфейсов IProduct и IOrder будут хранить информацию об объекте продукта и заказа.
+```ts
+interface ICatalog {
+    api: ICatalogAPI,
+    items: IProduct[],
+    load(): void
+}
+
+interface ICatalogAPI {
+    getProducts(): Promise<IProduct[]>;
+    getProductById(id: string): Promise<IProduct>;
+    order(order: IOrder): Promise<IOrderResult>
+} 
+
+interface IProduct {
+    id: string,
+    description: string,
+    image: string,
+    title: string,
+    category: string,
+    price: number
+}
+
+interface IOrder {
+    payment: string,
+    email: string,
+    phone: string,
+    address: string,
+    total: number,
+    items: string[]
+}
+```
+
+
+# Отображение (View)
 
 ```ts
 interface IView {
+	element: HTMLElement;
 	render(data?: object): HTMLElement;
 }
 
 class BasketView implements IView {
     constructor(protected container: HTMLElement) {}
     render(data: { items: HTMLElement[] }) {
-        if (data) {
-			this.container.replaceChildren(...data.items);
-		}
-		return this.container;
+        
     }
 }
-```
 
-# Модели
-IBasketModel умеет добавлять и удалять определённые элементы из списка
-```ts
-interface IBasketModel {
-	items: Map<string, number>;
-	add(id: string): void;
-	remove(id: string): void;
+class ProductView implements IView {
+	element: HTMLLIElement;
+	render(data: { items: HTMLElement }) {
+
+	}
 }
 ```
 
-ICatalogModel умеет добавлять объекты типа IProduct в список, и получать объект
-по id.
-```ts
-interface ICatalogModel {
-	items: IProduct[];
-	setItems(items: IProduct[]): void;
-	getProduct(id: string): IProduct;
-}
-```
 
-# Контроллеры
+# Events (IEventEmitter)
+
+Так как мы выбрали архитектуру событийно-ориентированную, 
+то у нас есть брокер событий.
 
 Брокер событий
 ```ts
@@ -102,6 +136,7 @@ interface IEventEmitter {
 Например в данном случае мы слушаем события 'basket:change', 'ui:basket-add',
 'ui:basket-remove' и в зависимости от события делаем разные действия, рендерим корзину,
 добавляем новый элемент в корзину, удаляем элемент из корзины
+
 ```ts
 events.on('basket:change', (event: { items: string[] }) => {
 	renderBasket(event.items);
